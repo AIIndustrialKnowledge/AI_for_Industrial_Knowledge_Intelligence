@@ -1,5 +1,8 @@
 package com.aiindustrial.backend.repository;
 
-public class SensorReadingRepository {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.aiindustrial.backend.entity.SensorReading;
+
+public interface SensorReadingRepository extends JpaRepository<SensorReading, Long> {
+
 }
