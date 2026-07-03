@@ -18,6 +18,7 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
+
       <Navbar />
 
       <div className="main-container">
@@ -29,21 +30,13 @@ function App() {
           <Routes>
 
             <Route path="/" element={<Dashboard />} />
-
             <Route path="/users" element={<Users />} />
-
             <Route path="/workers" element={<Workers />} />
-
             <Route path="/sensors" element={<Sensors />} />
-
             <Route path="/equipment" element={<Equipment />} />
-
             <Route path="/zones" element={<PlantZones />} />
-
             <Route path="/alerts" element={<Alerts />} />
-
             <Route path="/incidents" element={<Incidents />} />
-
             <Route path="/risk" element={<RiskPrediction />} />
 
           </Routes>
