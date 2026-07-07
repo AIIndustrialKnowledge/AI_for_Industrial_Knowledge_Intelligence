@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 function Users() {
 
     const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
 
     const [formData, setFormData] = useState({
 
@@ -16,23 +19,31 @@ function Users() {
     const [editing, setEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    const loadUsers = () => {
+   const loadUsers = () => {
 
-        API.get("/users")
+    setLoading(true);
 
-            .then((res) => {
+    API.get("/users")
 
-                setUsers(res.data);
+        .then((res) => {
 
-            })
+            setUsers(res.data);
 
-            .catch((err) => {
+            setLoading(false);
 
-                console.log(err);
+        })
 
-            });
+        .catch((err) => {
 
-    };
+            console.log(err);
+
+            toast.error("Unable to load users");
+
+            setLoading(false);
+
+        });
+
+};
 
     useEffect(() => {
 
@@ -53,12 +64,24 @@ function Users() {
     };
 
     const addUser = () => {
+        if (
+    formData.fullName.trim() === "" ||
+    formData.email.trim() === "" ||
+    formData.password.trim() === "" ||
+    formData.role.trim() === ""
+) {
+    toast.warning("Please fill all fields");
+    return;
+}
+
+
+
 
         API.post("/users", formData)
 
             .then(() => {
 
-                alert("User Added Successfully");
+                toast.success("User Added Successfully");
 
                 loadUsers();
 
@@ -78,10 +101,11 @@ function Users() {
 
             .catch((err) => {
 
-                console.log(err);
+    console.log(err);
 
-            });
+    toast.error("Unable to Add User");
 
+});
     };
 
     const deleteUser = (id) => {
@@ -90,12 +114,30 @@ function Users() {
 
             .then(() => {
 
-                alert("User Deleted");
+              toast.success("User Deleted Successfully");
 
                 loadUsers();
 
             });
 
+    };
+    if (loading) {
+
+    return (
+
+        <div className="text-center mt-5">
+
+            <div className="spinner-border text-primary"></div>
+
+            <h5 className="mt-3">
+                Loading Users...
+            </h5>
+
+        </div>
+
+    );
+
+}
     };   
 
         const editUser = (user) => {
@@ -172,57 +214,40 @@ function Users() {
 
                     <div className="col-md-3">
 
-                        <input
+    <input
+        className="form-control"
+        placeholder="Email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+    />
 
-                            className="form-control"
-
-                            placeholder="Email"
-
-                            name="email"
-
-                            value={formData.email}
-
-                            onChange={handleChange}
-
-                        />
-
-                    </div>
+</div>
 
                     <div className="col-md-3">
 
-                        <input
+    <input
+        type="password"
+        className="form-control"
+        placeholder="Password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+    />
 
-                            className="form-control"
+</div>
 
-                            placeholder="Password"
+<div className="col-md-3">
 
-                            name="password"
+    <input
+        className="form-control"
+        placeholder="Role"
+        name="role"
+        value={formData.role}
+        onChange={handleChange}
+    />
 
-                            value={formData.password}
-
-                            onChange={handleChange}
-
-                        />
-
-                    </div>
-
-                    <div className="col-md-3">
-
-                        <input
-
-                            className="form-control"
-
-                            placeholder="Role"
-
-                            name="role"
-
-                            value={formData.role}
-
-                            onChange={handleChange}
-
-                        />
-
-                    </div>
+</div>
 
                 </div>
 
@@ -245,7 +270,13 @@ function Users() {
 }
 
             </div>
-
+            <input
+    type="text"
+    className="form-control mb-3"
+    placeholder="🔍 Search User by Name..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+/> 
             <table className="table table-bordered table-striped">
 
                 <thead className="table-dark">
@@ -268,20 +299,55 @@ function Users() {
 
                 <tbody>
 
-                    {
+{
+    users.length === 0 ? (
 
-                        users.map((user) => (
+        <tr>
+            <td colSpan="5" className="text-center text-danger">
+                No Users Found
+            </td>
+        </tr>
 
-                            <tr key={user.userId}>
+    ) : (
 
-                                <td>{user.userId}</td>
+users
+.filter((user) =>
+    user.fullName.toLowerCase().includes(search.toLowerCase())
+)
+.sort((a, b) => a.fullName.localeCompare(b.fullName))
+.map((user) => (
 
-                                <td>{user.fullName}</td>
+            <tr key={user.userId}>
 
-                                <td>{user.email}</td>
+                <td>{user.userId}</td>
 
-                                <td>{user.role}</td>
+                <td>{user.fullName}</td>
 
+                <td>{user.email}</td>
+
+                <td>{user.role}</td>
+
+                <td>
+
+                    <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this user?")) {
+                                deleteUser(user.userId);
+                            }
+                        }}
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        ))
+
+    )
+}
                                <td>
 
     <button
@@ -306,7 +372,7 @@ function Users() {
 
                     }
 
-                </tbody>
+</tbody>
 
             </table>
 

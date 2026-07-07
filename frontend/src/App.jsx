@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import ChatBot from "./components/chatbot/ChatBot";
 
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
@@ -16,7 +17,9 @@ import RiskPrediction from "./pages/RiskPrediction";
 import "./App.css";
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <Navbar />
@@ -45,8 +48,14 @@ function App() {
 
       </div>
 
+   
+
+      <ChatBot />
+
     </BrowserRouter>
+
   );
+
 }
 
 export default App;
