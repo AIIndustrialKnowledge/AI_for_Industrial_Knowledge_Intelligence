@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import ChatBot from "./components/chatbot/ChatBot";
 
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
@@ -16,8 +17,11 @@ import RiskPrediction from "./pages/RiskPrediction";
 import "./App.css";
 
 function App() {
+
   return (
+
     <BrowserRouter>
+
       <Navbar />
 
       <div className="main-container">
@@ -29,21 +33,13 @@ function App() {
           <Routes>
 
             <Route path="/" element={<Dashboard />} />
-
             <Route path="/users" element={<Users />} />
-
             <Route path="/workers" element={<Workers />} />
-
             <Route path="/sensors" element={<Sensors />} />
-
             <Route path="/equipment" element={<Equipment />} />
-
             <Route path="/zones" element={<PlantZones />} />
-
             <Route path="/alerts" element={<Alerts />} />
-
             <Route path="/incidents" element={<Incidents />} />
-
             <Route path="/risk" element={<RiskPrediction />} />
 
           </Routes>
@@ -52,8 +48,14 @@ function App() {
 
       </div>
 
+   
+
+      <ChatBot />
+
     </BrowserRouter>
+
   );
+
 }
 
 export default App;
