@@ -22,7 +22,7 @@ public class Permit {
     }
 
     public Permit(Long permitId, String permitType, String workerName,
-                  String location, String status) {
+            String location, String status) {
         this.permitId = permitId;
         this.permitType = permitType;
         this.workerName = workerName;

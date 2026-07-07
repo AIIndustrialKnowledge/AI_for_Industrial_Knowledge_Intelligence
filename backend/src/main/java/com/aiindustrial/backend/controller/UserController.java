@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import com.aiindustrial.backend.entity.User;
 import com.aiindustrial.backend.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
@@ -22,7 +24,7 @@ public class UserController {
     // CREATE USER
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User saveUser(@RequestBody User user) {
+    public User saveUser(@Valid @RequestBody User user) {
         return userService.saveUser(user);
     }
 
