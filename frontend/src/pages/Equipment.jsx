@@ -1,127 +1,252 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 function Equipment() {
+
+  const [equipment, setEquipment] = useState([]);
+
+  const [formData, setFormData] = useState({
+    equipmentName: "",
+    equipmentType: "",
+    status: "",
+    zone: ""
+  });
+
+  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  useEffect(() => {
+    loadEquipment();
+  }, []);
+
+  const loadEquipment = () => {
+    API.get("/equipment")
+      .then((res) => setEquipment(res.data))
+      .catch((err) => console.log(err));
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const addEquipment = () => {
+    API.post("/equipment", formData)
+      .then(() => {
+        alert("Equipment Added Successfully");
+
+        loadEquipment();
+
+        setFormData({
+          equipmentName: "",
+          equipmentType: "",
+          status: "",
+          zone: ""
+        });
+
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const editEquipment = (item) => {
+
+    setEditing(true);
+
+    setEditingId(item.equipmentId);
+
+    setFormData({
+      equipmentName: item.equipmentName,
+      equipmentType: item.equipmentType,
+      status: item.status,
+      zone: item.zone
+    });
+
+  };
+
+  const updateEquipment = () => {
+
+    API.put(`/equipment/${editingId}`, formData)
+      .then(() => {
+
+        alert("Equipment Updated Successfully");
+
+        loadEquipment();
+
+        setEditing(false);
+
+        setEditingId(null);
+
+        setFormData({
+          equipmentName: "",
+          equipmentType: "",
+          status: "",
+          zone: ""
+        });
+
+      });
+
+  };
+
+  const deleteEquipment = (id) => {
+
+    if (window.confirm("Delete Equipment?")) {
+
+      API.delete(`/equipment/${id}`)
+        .then(() => {
+
+          alert("Equipment Deleted");
+
+          loadEquipment();
+
+        });
+
+    }
+
+  };
+
   return (
+
     <div className="container mt-4">
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Equipment Management</h2>
+      <h2 className="mb-4">Equipment Management</h2>
 
-        <button className="btn btn-primary">
-          + Add Equipment
-        </button>
+      <div className="card p-4 mb-4">
+
+        <div className="row">
+
+          <div className="col-md-3 mb-3">
+            <input
+              className="form-control"
+              placeholder="Equipment Name"
+              name="equipmentName"
+              value={formData.equipmentName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-3 mb-3">
+            <input
+              className="form-control"
+              placeholder="Equipment Type"
+              name="equipmentType"
+              value={formData.equipmentType}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-3 mb-3">
+            <input
+              className="form-control"
+              placeholder="Status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-3 mb-3">
+            <input
+              className="form-control"
+              placeholder="Zone"
+              name="zone"
+              value={formData.zone}
+              onChange={handleChange}
+            />
+          </div>
+
+        </div>
+
+        {
+          editing ? (
+
+            <button
+              className="btn btn-success"
+              onClick={updateEquipment}
+            >
+              Update Equipment
+            </button>
+
+          ) : (
+
+            <button
+              className="btn btn-primary"
+              onClick={addEquipment}
+            >
+              Add Equipment
+            </button>
+
+          )
+        }
+
       </div>
 
-      <table className="table table-bordered table-striped table-hover">
+      <table className="table table-bordered table-striped">
 
         <thead className="table-dark">
+
           <tr>
+
             <th>ID</th>
-            <th>Equipment Name</th>
-            <th>Category</th>
-            <th>Location</th>
+            <th>Name</th>
+            <th>Type</th>
             <th>Status</th>
-            <th>Last Maintenance</th>
-            <th>Actions</th>
+            <th>Zone</th>
+            <th>Action</th>
+
           </tr>
+
         </thead>
 
         <tbody>
 
-          <tr>
-            <td>1</td>
-            <td>Boiler</td>
-            <td>Heating</td>
-            <td>Plant A</td>
-            <td>
-              <span className="badge bg-success">
-                Running
-              </span>
-            </td>
-            <td>20-06-2026</td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+          {
+            equipment.map((item) => (
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+              <tr key={item.equipmentId}>
 
-          <tr>
-            <td>2</td>
-            <td>Generator</td>
-            <td>Power</td>
-            <td>Plant B</td>
-            <td>
-              <span className="badge bg-warning text-dark">
-                Maintenance
-              </span>
-            </td>
-            <td>15-06-2026</td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{item.equipmentId}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>{item.equipmentName}</td>
 
-          <tr>
-            <td>3</td>
-            <td>Compressor</td>
-            <td>Air System</td>
-            <td>Plant C</td>
-            <td>
-              <span className="badge bg-success">
-                Running
-              </span>
-            </td>
-            <td>10-06-2026</td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{item.equipmentType}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>{item.status}</td>
 
-          <tr>
-            <td>4</td>
-            <td>Cooling Pump</td>
-            <td>Cooling</td>
-            <td>Plant D</td>
-            <td>
-              <span className="badge bg-danger">
-                Stopped
-              </span>
-            </td>
-            <td>05-06-2026</td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{item.zone}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>
+
+                  <button
+                    className="btn btn-warning btn-sm me-2"
+                    onClick={() => editEquipment(item)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => deleteEquipment(item.equipmentId)}
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+
+            ))
+          }
 
         </tbody>
 
       </table>
 
     </div>
+
   );
+
 }
 
 export default Equipment;

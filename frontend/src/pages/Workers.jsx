@@ -1,118 +1,278 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 function Workers() {
+
+  const [workers, setWorkers] = useState([]);
+
+  const [formData, setFormData] = useState({
+    workerName: "",
+    department: "",
+    shift: "",
+    location: "",
+    helmetWorn: false
+  });
+
+  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  useEffect(() => {
+    loadWorkers();
+  }, []);
+
+  const loadWorkers = () => {
+    API.get("/workers")
+      .then((res) => setWorkers(res.data))
+      .catch((err) => console.log(err));
+  };
+
+  const handleChange = (e) => {
+
+    const { name, value, type, checked } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value
+    });
+
+  };
+
+  const addWorker = () => {
+
+    API.post("/workers", formData)
+      .then(() => {
+
+        alert("Worker Added Successfully");
+
+        loadWorkers();
+
+        setFormData({
+          workerName: "",
+          department: "",
+          shift: "",
+          location: "",
+          helmetWorn: false
+        });
+
+      });
+
+  };
+
+  const editWorker = (worker) => {
+
+    setEditing(true);
+
+    setEditingId(worker.workerId);
+
+    setFormData(worker);
+
+  };
+
+  const updateWorker = () => {
+
+    API.put(`/workers/${editingId}`, formData)
+      .then(() => {
+
+        alert("Worker Updated Successfully");
+
+        loadWorkers();
+
+        setEditing(false);
+
+        setEditingId(null);
+
+        setFormData({
+          workerName: "",
+          department: "",
+          shift: "",
+          location: "",
+          helmetWorn: false
+        });
+
+      });
+
+  };
+
+  const deleteWorker = (id) => {
+
+    if (window.confirm("Delete Worker?")) {
+
+      API.delete(`/workers/${id}`)
+        .then(() => {
+
+          alert("Worker Deleted");
+
+          loadWorkers();
+
+        });
+
+    }
+
+  };
+
   return (
+
     <div className="container mt-4">
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Workers Management</h2>
+      <h2 className="mb-4">Workers Management</h2>
 
-        <button className="btn btn-primary">
-          + Add Worker
-        </button>
+      <div className="card p-4 mb-4">
+
+        <div className="row">
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Worker Name"
+              name="workerName"
+              value={formData.workerName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Department"
+              name="department"
+              value={formData.department}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Shift"
+              name="shift"
+              value={formData.shift}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="helmetWorn"
+                checked={formData.helmetWorn}
+                onChange={handleChange}
+              />
+
+              Helmet Worn
+
+            </label>
+
+          </div>
+
+        </div>
+
+        {
+
+          editing ?
+
+          <button
+            className="btn btn-success"
+            onClick={updateWorker}
+          >
+            Update Worker
+          </button>
+
+          :
+
+          <button
+            className="btn btn-primary"
+            onClick={addWorker}
+          >
+            Add Worker
+          </button>
+
+        }
+
       </div>
 
-      <table className="table table-bordered table-striped table-hover">
+      <table className="table table-bordered table-striped">
 
         <thead className="table-dark">
 
           <tr>
+
             <th>ID</th>
             <th>Name</th>
             <th>Department</th>
             <th>Shift</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>Location</th>
+            <th>Helmet</th>
+            <th>Action</th>
+
           </tr>
 
         </thead>
 
         <tbody>
 
-          <tr>
-            <td>1</td>
-            <td>Ranga</td>
-            <td>Production</td>
-            <td>Morning</td>
-            <td>
-              <span className="badge bg-success">Active</span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+          {
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+            workers.map((worker) => (
 
-          <tr>
-            <td>2</td>
-            <td>Hemanth</td>
-            <td>Maintenance</td>
-            <td>Night</td>
-            <td>
-              <span className="badge bg-warning text-dark">
-                On Leave
-              </span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+              <tr key={worker.workerId}>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>{worker.workerId}</td>
 
-          <tr>
-            <td>3</td>
-            <td>Rahul</td>
-            <td>Quality</td>
-            <td>Evening</td>
-            <td>
-              <span className="badge bg-success">Active</span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{worker.workerName}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>{worker.department}</td>
 
-          <tr>
-            <td>4</td>
-            <td>Arjun</td>
-            <td>Packaging</td>
-            <td>Morning</td>
-            <td>
-              <span className="badge bg-danger">Absent</span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{worker.shift}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>{worker.location}</td>
+
+                <td>{worker.helmetWorn ? "Yes" : "No"}</td>
+
+                <td>
+
+                  <button
+                    className="btn btn-warning btn-sm me-2"
+                    onClick={() => editWorker(worker)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => deleteWorker(worker.workerId)}
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+
+            ))
+
+          }
 
         </tbody>
 
       </table>
 
     </div>
+
   );
+
 }
 
 export default Workers;

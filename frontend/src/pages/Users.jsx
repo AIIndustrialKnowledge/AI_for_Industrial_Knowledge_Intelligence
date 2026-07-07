@@ -16,6 +16,8 @@ function Users() {
         role: ""
 
     });
+    const [editing, setEditing] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
    const loadUsers = () => {
 
@@ -136,7 +138,48 @@ function Users() {
     );
 
 }
+    };   
 
+        const editUser = (user) => {
+
+    setEditing(true);
+
+    setEditingId(user.userId);
+
+    setFormData({
+        fullName: user.fullName,
+        email: user.email,
+        password: user.password,
+        role: user.role
+    });
+
+};
+    const updateUser = () => {
+
+    API.put(`/users/${editingId}`, formData)
+
+        .then(() => {
+
+            alert("User Updated Successfully");
+
+            loadUsers();
+
+            setEditing(false);
+
+            setEditingId(null);
+
+            setFormData({
+                fullName: "",
+                email: "",
+                password: "",
+                role: ""
+            });
+
+        })
+
+        .catch((err) => console.log(err));
+
+};
     return (
 
         <div className="container mt-4">
@@ -208,17 +251,23 @@ function Users() {
 
                 </div>
 
-                <button
-
-                    className="btn btn-primary mt-3"
-
-                    onClick={addUser}
-
-                >
-
-                    Add User
-
-                </button>
+                {
+    editing ? (
+        <button
+            className="btn btn-success mt-3"
+            onClick={updateUser}
+        >
+            Update User
+        </button>
+    ) : (
+        <button
+            className="btn btn-primary mt-3"
+            onClick={addUser}
+        >
+            Add User
+        </button>
+    )
+}
 
             </div>
             <input
@@ -299,6 +348,29 @@ users
 
     )
 }
+                               <td>
+
+    <button
+        className="btn btn-warning btn-sm me-2"
+        onClick={() => editUser(user)}
+    >
+        Edit
+    </button>
+
+    <button
+        className="btn btn-danger btn-sm"
+        onClick={() => deleteUser(user.userId)}
+    >
+        Delete
+    </button>
+
+</td>
+
+                            </tr>
+
+                        ))
+
+                    }
 
 </tbody>
 
