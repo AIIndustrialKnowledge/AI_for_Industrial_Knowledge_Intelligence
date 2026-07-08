@@ -3,49 +3,58 @@ package com.aiindustrial.backend.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.aiindustrial.backend.entity.RiskPrediction;
-import com.aiindustrial.backend.service.RiskPredictionService;
+import com.aiindustrial.backend.entity.Incident;
+import com.aiindustrial.backend.service.IncidentService;
 
 @RestController
-@RequestMapping("/risk-predictions")
+@RequestMapping("/incidents")
 @CrossOrigin(origins = "*")
-public class RiskPredictionController {
+public class IncidentController {
 
-    private final RiskPredictionService service;
+    private final IncidentService incidentService;
 
-    public RiskPredictionController(RiskPredictionService service) {
-        this.service = service;
+    public IncidentController(IncidentService incidentService) {
+        this.incidentService = incidentService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RiskPrediction save(@RequestBody RiskPrediction prediction) {
-        return service.savePrediction(prediction);
+    public Incident save(@RequestBody Incident incident) {
+        return incidentService.saveIncident(incident);
     }
 
     @GetMapping
-    public List<RiskPrediction> getAll() {
-        return service.getAllPredictions();
+    public List<Incident> getAll() {
+        return incidentService.getAllIncidents();
     }
 
     @GetMapping("/{id}")
-    public RiskPrediction getOne(@PathVariable Long id) {
-        return service.getPrediction(id);
+    public Incident getOne(@PathVariable Long id) {
+        return incidentService.getIncident(id);
     }
 
     @PutMapping("/{id}")
-    public RiskPrediction update(@PathVariable Long id,
-            @RequestBody RiskPrediction prediction) {
-        return service.updatePrediction(id, prediction);
+    public Incident update(@PathVariable Long id,
+                           @RequestBody Incident incident) {
+        return incidentService.updateIncident(id, incident);
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
 
-        service.deletePrediction(id);
+        incidentService.deleteIncident(id);
 
-        return "Risk Prediction Deleted Successfully";
+        return "Incident Deleted Successfully";
     }
 }
