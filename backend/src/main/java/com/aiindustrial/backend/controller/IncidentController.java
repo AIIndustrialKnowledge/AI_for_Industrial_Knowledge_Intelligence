@@ -5,48 +5,47 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import com.aiindustrial.backend.entity.Incident;
-import com.aiindustrial.backend.service.IncidentService;
+import com.aiindustrial.backend.entity.RiskPrediction;
+import com.aiindustrial.backend.service.RiskPredictionService;
 
 @RestController
-@RequestMapping("/incidents")
-@CrossOrigin("*")
-public class IncidentController {
+@RequestMapping("/risk-predictions")
+@CrossOrigin(origins = "*")
+public class RiskPredictionController {
 
-    private final IncidentService incidentService;
+    private final RiskPredictionService service;
 
-    public IncidentController(IncidentService incidentService) {
-        this.incidentService = incidentService;
+    public RiskPredictionController(RiskPredictionService service) {
+        this.service = service;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Incident save(@RequestBody Incident incident) {
-        return incidentService.saveIncident(incident);
+    public RiskPrediction save(@RequestBody RiskPrediction prediction) {
+        return service.savePrediction(prediction);
     }
 
     @GetMapping
-    public List<Incident> getAll() {
-        return incidentService.getAllIncidents();
+    public List<RiskPrediction> getAll() {
+        return service.getAllPredictions();
     }
 
     @GetMapping("/{id}")
-    public Incident getOne(@PathVariable Long id) {
-        return incidentService.getIncident(id);
+    public RiskPrediction getOne(@PathVariable Long id) {
+        return service.getPrediction(id);
     }
 
     @PutMapping("/{id}")
-    public Incident update(@PathVariable Long id,
-            @RequestBody Incident incident) {
-        return incidentService.updateIncident(id, incident);
+    public RiskPrediction update(@PathVariable Long id,
+            @RequestBody RiskPrediction prediction) {
+        return service.updatePrediction(id, prediction);
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
 
-        incidentService.deleteIncident(id);
+        service.deletePrediction(id);
 
-        return "Incident Deleted Successfully";
+        return "Risk Prediction Deleted Successfully";
     }
-
 }

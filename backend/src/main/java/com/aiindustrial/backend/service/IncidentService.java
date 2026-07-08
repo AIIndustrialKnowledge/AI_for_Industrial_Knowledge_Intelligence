@@ -16,38 +16,33 @@ public class IncidentService {
         this.incidentRepository = incidentRepository;
     }
 
-    public List<Incident> getAllIncidents() {
-        return incidentRepository.findAll();
-    }
-
     public Incident saveIncident(Incident incident) {
         return incidentRepository.save(incident);
     }
 
-    public Incident getIncident(Long id) {
-        return incidentRepository.findById(id).orElse(null);
+    public List<Incident> getAllIncidents() {
+        return incidentRepository.findAll();
     }
 
-    public Incident updateIncident(Long id, Incident incident) {
+    public Incident getIncident(Long id) {
+        return incidentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Incident Not Found"));
+    }
 
-        Incident existing = getIncident(id);
+    public Incident updateIncident(Long id, Incident updatedIncident) {
 
-        if (existing != null) {
+        Incident incident = getIncident(id);
 
-            existing.setIncidentType(incident.getIncidentType());
-            existing.setSeverity(incident.getSeverity());
-            existing.setLocation(incident.getLocation());
-            existing.setDescription(incident.getDescription());
-            existing.setStatus(incident.getStatus());
+        incident.setIncidentType(updatedIncident.getIncidentType());
+        incident.setSeverity(updatedIncident.getSeverity());
+        incident.setLocation(updatedIncident.getLocation());
+        incident.setDescription(updatedIncident.getDescription());
+        incident.setStatus(updatedIncident.getStatus());
 
-            return incidentRepository.save(existing);
-        }
-
-        return null;
+        return incidentRepository.save(incident);
     }
 
     public void deleteIncident(Long id) {
         incidentRepository.deleteById(id);
     }
-
 }
