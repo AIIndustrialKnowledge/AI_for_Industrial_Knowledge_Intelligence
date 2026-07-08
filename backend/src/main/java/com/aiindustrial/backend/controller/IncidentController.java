@@ -46,7 +46,9 @@ public class IncidentController {
 
     @PutMapping("/{id}")
     public Incident update(@PathVariable Long id,
-                           @RequestBody Incident incident) {
+
+            @RequestBody Incident incident) {
+
         return incidentService.updateIncident(id, incident);
     }
 
