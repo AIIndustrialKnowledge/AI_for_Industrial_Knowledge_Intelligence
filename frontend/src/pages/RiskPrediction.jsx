@@ -1,46 +1,112 @@
 import { useState } from "react";
+import API from "../services/api";
 
 function RiskPrediction() {
 
-  const [result, setResult] = useState("");
+    const [prediction, setPrediction] = useState(null);
 
-  const predictRisk = () => {
+    const predictRisk = () => {
 
-    const risks = ["LOW", "MEDIUM", "HIGH"];
+        API.get("/risk-predictions")
 
-    const randomRisk = risks[Math.floor(Math.random() * risks.length)];
+            .then((res) => {
 
-    setResult(randomRisk);
+                if (res.data.length > 0) {
 
-  };
+                    setPrediction(res.data[0]);
 
-  return (
+                } else {
 
-    <div className="container mt-4">
+                    alert("No Risk Prediction Data Found");
 
-      <h2>Risk Prediction</h2>
+                }
 
-      <button
-        className="btn btn-danger"
-        onClick={predictRisk}
-      >
-        Predict Risk
-      </button>
+            })
 
-      {result && (
+            .catch((err) => {
 
-        <div className="alert alert-warning mt-4">
+                console.log(err);
 
-          Predicted Risk Level :
-          <strong> {result}</strong>
+                alert("Unable to Fetch Prediction");
+
+            });
+
+    };
+
+    return (
+
+        <div className="container mt-4">
+
+            <h2>Risk Prediction</h2>
+
+            <button
+                className="btn btn-danger"
+                onClick={predictRisk}
+            >
+                Predict Risk
+            </button>
+
+            {
+
+                prediction && (
+
+                    <div className="card mt-4 p-4">
+
+                        <h4>
+
+                            Risk Score :
+                            {prediction.riskScore}
+
+                        </h4>
+
+                        <h4>
+
+                            Risk Level :
+                            {prediction.riskLevel}
+
+                        </h4>
+
+                        <h4>
+
+                            Recommendation :
+
+                        </h4>
+
+                        <p>
+
+                            {prediction.recommendation}
+
+                        </p>
+
+                        <h5>
+
+                            Alert Generated :
+
+                            {
+
+                                prediction.alertGenerated
+
+                                    ?
+
+                                    " YES"
+
+                                    :
+
+                                    " NO"
+
+                            }
+
+                        </h5>
+
+                    </div>
+
+                )
+
+            }
 
         </div>
 
-      )}
-
-    </div>
-
-  );
+    );
 
 }
 

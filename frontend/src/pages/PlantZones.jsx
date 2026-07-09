@@ -1,139 +1,250 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 function PlantZones() {
+
+  const [zones, setZones] = useState([]);
+
+  const [formData, setFormData] = useState({
+    zoneName: "",
+    zoneType: "",
+    riskLevel: "",
+    status: "",
+    description: ""
+  });
+
+  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  useEffect(() => {
+    loadZones();
+  }, []);
+
+  const loadZones = () => {
+    API.get("/zones")
+      .then((res) => setZones(res.data))
+      .catch((err) => console.log(err));
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const addZone = () => {
+    API.post("/zones", formData)
+      .then(() => {
+
+        alert("Zone Added Successfully");
+
+        loadZones();
+
+        setFormData({
+          zoneName: "",
+          zoneType: "",
+          riskLevel: "",
+          status: "",
+          description: ""
+        });
+
+      });
+  };
+
+  const editZone = (zone) => {
+
+    setEditing(true);
+
+    setEditingId(zone.zoneId);
+
+    setFormData({
+      zoneName: zone.zoneName,
+      zoneType: zone.zoneType,
+      riskLevel: zone.riskLevel,
+      status: zone.status,
+      description: zone.description
+    });
+
+  };
+
+  const updateZone = () => {
+
+    API.put(`/zones/${editingId}`, formData)
+      .then(() => {
+
+        alert("Zone Updated Successfully");
+
+        loadZones();
+
+        setEditing(false);
+
+        setEditingId(null);
+
+      });
+
+  };
+
+  const deleteZone = (id) => {
+
+    if (window.confirm("Delete Zone?")) {
+
+      API.delete(`/zones/${id}`)
+        .then(() => {
+
+          alert("Zone Deleted");
+
+          loadZones();
+
+        });
+
+    }
+
+  };
+
   return (
+
     <div className="container mt-4">
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Plant Zones Management</h2>
+      <h2 className="mb-4">Plant Zones</h2>
 
-        <button className="btn btn-primary">
-          + Add Zone
-        </button>
+      <div className="card p-4 mb-4">
+
+        <div className="row">
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Zone Name"
+              name="zoneName"
+              value={formData.zoneName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Zone Type"
+              name="zoneType"
+              value={formData.zoneType}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Risk Level"
+              name="riskLevel"
+              value={formData.riskLevel}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <input
+              className="form-control"
+              placeholder="Status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-8 mb-3">
+            <input
+              className="form-control"
+              placeholder="Description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+
+        </div>
+
+        {
+          editing ? (
+            <button
+              className="btn btn-success"
+              onClick={updateZone}
+            >
+              Update Zone
+            </button>
+          ) : (
+            <button
+              className="btn btn-primary"
+              onClick={addZone}
+            >
+              Add Zone
+            </button>
+          )
+        }
+
       </div>
 
-      <table className="table table-bordered table-striped table-hover">
+      <table className="table table-bordered table-striped">
 
         <thead className="table-dark">
 
           <tr>
             <th>ID</th>
             <th>Zone Name</th>
-            <th>Location</th>
-            <th>Supervisor</th>
+            <th>Zone Type</th>
             <th>Risk Level</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Description</th>
+            <th>Action</th>
           </tr>
 
         </thead>
 
         <tbody>
 
-          <tr>
-            <td>1</td>
-            <td>Zone A</td>
-            <td>Production Block</td>
-            <td>Ranga</td>
-            <td>
-              <span className="badge bg-danger">High</span>
-            </td>
-            <td>
-              <span className="badge bg-success">Active</span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+          {
+            zones.map((zone) => (
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+              <tr key={zone.zoneId}>
 
-          <tr>
-            <td>2</td>
-            <td>Zone B</td>
-            <td>Storage Area</td>
-            <td>Hemanth</td>
-            <td>
-              <span className="badge bg-warning text-dark">
-                Medium
-              </span>
-            </td>
-            <td>
-              <span className="badge bg-success">Active</span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                <td>{zone.zoneId}</td>
+                <td>{zone.zoneName}</td>
+                <td>{zone.zoneType}</td>
+                <td>{zone.riskLevel}</td>
+                <td>{zone.status}</td>
+                <td>{zone.description}</td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                <td>
 
-          <tr>
-            <td>3</td>
-            <td>Zone C</td>
-            <td>Maintenance</td>
-            <td>Rahul</td>
-            <td>
-              <span className="badge bg-success">
-                Low
-              </span>
-            </td>
-            <td>
-              <span className="badge bg-secondary">
-                Under Maintenance
-              </span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                  <button
+                    className="btn btn-warning btn-sm me-2"
+                    onClick={() => editZone(zone)}
+                  >
+                    Edit
+                  </button>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => deleteZone(zone.zoneId)}
+                  >
+                    Delete
+                  </button>
 
-          <tr>
-            <td>4</td>
-            <td>Zone D</td>
-            <td>Quality Check</td>
-            <td>Arjun</td>
-            <td>
-              <span className="badge bg-danger">
-                High
-              </span>
-            </td>
-            <td>
-              <span className="badge bg-success">
-                Active
-              </span>
-            </td>
-            <td>
-              <button className="btn btn-warning btn-sm me-2">
-                Edit
-              </button>
+                </td>
 
-              <button className="btn btn-danger btn-sm">
-                Delete
-              </button>
-            </td>
-          </tr>
+              </tr>
+
+            ))
+          }
 
         </tbody>
 
       </table>
 
     </div>
+
   );
+
 }
 
 export default PlantZones;

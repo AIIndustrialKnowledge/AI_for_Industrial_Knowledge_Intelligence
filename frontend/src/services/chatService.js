@@ -1,19 +1,26 @@
+import API from "./api";
+
 const sendMessage = async (question) => {
 
-  return new Promise((resolve) => {
+    try {
 
-    setTimeout(() => {
+        const response = await API.post("/chat", {
+            question: question
+        });
 
-      resolve({
+        return {
+            reply: response.data.answer
+        };
 
-        reply:
-          "🤖 Backend is not connected yet. Gemini response will appear here."
+    } catch (error) {
 
-      });
+        console.error(error);
 
-    }, 1500);
+        return {
+            reply: "❌ Unable to connect to backend."
+        };
 
-  });
+    }
 
 };
 
