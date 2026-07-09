@@ -1,32 +1,48 @@
 package com.aiindustrial.backend.service;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Service;
-
-import com.aiindustrial.backend.ai.SafetyKnowledgeBase;
 
 @Service
 public class ChatBotService {
 
-    public String getAnswer(String question) {
+    private final GeminiService geminiService;
 
-        Map<String, String> knowledge = SafetyKnowledgeBase.getKnowledge();
-
-        String q = question.toLowerCase();
-
-        for (String key : knowledge.keySet()) {
-
-            if (q.contains(key)) {
-
-                return knowledge.get(key);
-
-            }
-
-        }
-
-        return "Sorry, I don't have information about that safety issue. Please contact the safety officer.";
-
+    public ChatBotService(GeminiService geminiService) {
+        this.geminiService = geminiService;
     }
 
+    public String getAnswer(String question) {
+
+        if (question == null || question.trim().isEmpty()) {
+            return "Please ask a valid question.";
+        }
+
+        String prompt = """
+                You are an AI Industrial Safety Assistant.
+
+                Your responsibilities:
+                - Answer only Industrial Safety related questions.
+                - Topics include:
+                  • Fire Safety
+                  • PPE
+                  • Gas Leak
+                  • Chemical Safety
+                  • Electrical Safety
+                  • Worker Safety
+                  • Confined Space
+                  • Machine Safety
+                  • Emergency Response
+                  • Industrial Accidents
+                  • Plant Safety
+                  • Risk Assessment
+
+                If the question is unrelated to industrial safety,
+                politely respond:
+                "I'm an Industrial Safety AI Assistant. Please ask questions related to industrial safety."
+
+                User Question:
+                """ + question;
+
+        return geminiService.askGemini(prompt);
+    }
 }
